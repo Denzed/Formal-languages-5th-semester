@@ -17,12 +17,10 @@ public class Main {
         Automaton.setMinimization(Automaton.MINIMIZE_HOPCROFT);
 
         Automaton identifiersWithoutKeywordsAutomaton = identifiersAutomaton.minus(keywordsAutomaton);
-//        Automaton identifiersWithoutKeywordsAutomaton = identifiersAutomaton.minus(identifiersAutomaton.intersection(keywordsAutomaton));
         identifiersWithoutKeywordsAutomaton.minimize();
 
-//        System.out.println(identifiersAutomaton.toDot());
-//        System.out.println(keywordsAutomaton.toDot());
-//        System.out.println(identifiersAutomaton.intersection(keywordsAutomaton).toDot());
+        System.out.println(identifiersAutomaton.toDot());
+        System.out.println(keywordsAutomaton.toDot());
         System.out.println(identifiersWithoutKeywordsAutomaton.toDot());
     }
 }
