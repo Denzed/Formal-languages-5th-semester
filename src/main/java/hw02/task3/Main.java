@@ -8,7 +8,7 @@ public class Main {
     private static final String alphabetWithoutDigits = "_qwertyuiopasdfghjklzxcvbnm";
     private static final String[] keywords = {"if", "then", "else", "let", "in", "true", "false"};
 
-    private static final Automaton identifiersAutomaton = BasicAutomata.makeCharSet(alphabetWithoutDigits).concatenate(
+    public static final Automaton identifiersAutomaton = BasicAutomata.makeCharSet(alphabetWithoutDigits).concatenate(
             BasicAutomata.makeCharSet(alphabet).repeat());
 
     private static final Automaton keywordsAutomaton = BasicAutomata.makeStringUnion(keywords);
