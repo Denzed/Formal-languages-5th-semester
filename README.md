@@ -25,7 +25,7 @@ java -jar hw06-1.0-SNAPSHOT.jar automatonPath grammarPath outputPath
 ### Automaton format
 - should be described in DOT format
 - is a digraph
-- starting vertex has "plaintext" shape attribute
+- starting vertex has a "red" color attribute
 - terminal vertices have "doublecircle" shape attribute
 - edges have one symbol labels
 

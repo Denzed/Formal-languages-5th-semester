@@ -24,7 +24,7 @@ class Symbol private constructor(val label: String) {
     }
 
     companion object {
-        val EPS_TEXT = "eps"
+        private val EPS_TEXT = "eps"
         val EPS = Symbol(EPS_TEXT)
 
         fun makeSymbol(label: String): Symbol {
@@ -55,6 +55,10 @@ class Production(val symbol: Symbol, val products: List<Symbol>) {
         result = 31 * result + products.hashCode()
         return result
     }
+
+    override fun toString(): String {
+        return products.joinToString(" ", "${symbol.label}: ") { it.label }
+    }
 }
 
 class CFGrammar(
@@ -62,20 +66,24 @@ class CFGrammar(
         val productions: MutableMap<Symbol, MutableSet<Production>> = mutableMapOf()) {
 
     internal fun addProduction(production: Production) {
-        productions.withDefault { _ -> mutableSetOf() }[production.symbol]!!.add(production)
+        val symbol = production.symbol
+        if (symbol !in productions) {
+            productions[symbol] = mutableSetOf()
+        }
+        productions[symbol]!!.add(production)
     }
 
     fun toChomskyNormalForm(): CFGrammar {
         val shortGrammar = removeLongProductions()
         val epsFreeGrammar = shortGrammar.removeEpsProductions()
         val chainFreeGrammar = epsFreeGrammar.removeChainProductions()
-        return chainFreeGrammar.removeNonTerminalsInLongProductions()
+        return chainFreeGrammar.removeTerminalsInLongProductions()
     }
 
     private fun removeLongProductions(): CFGrammar {
         val shortGrammar = CFGrammar(initial)
         productions.forEach({ symbol, symbolProductions ->
-            var counter = 0
+            var id = 0
             for (production in symbolProductions) {
                 val products = production.products
                 val productsSize = products.size
@@ -85,20 +93,20 @@ class CFGrammar(
                 }
                 val addedSymbols = mutableListOf<Symbol>()
                 for (index in 0 until productsSize - 2) {
-                    addedSymbols.add(Symbol.makeSymbol(symbol.label + counter++))
+                    addedSymbols.add(Symbol.makeSymbol(symbol.label + id++))
                 }
-                shortGrammar.addProduction(
-                        Production(symbol, listOf(products[0], addedSymbols[0])))
-                for (index in 0 until productsSize - 2) {
+                var curSymbol = production.symbol
+                for (index in 0 until productsSize - 1) {
                     val newProduct =
-                            if (index == productsSize - 3)
-                                products[index + 2]
+                            if (index == productsSize - 2)
+                                products[index + 1]
                             else
-                                addedSymbols[index + 1]
+                                addedSymbols[index]
                     val newProduction =
-                            Production(addedSymbols[index],
-                                    listOf(products[index + 1], newProduct))
+                            Production(curSymbol,
+                                    listOf(products[index], newProduct))
                     shortGrammar.addProduction(newProduction)
+                    curSymbol = newProduct
                 }
             }
         })
@@ -113,7 +121,7 @@ class CFGrammar(
         })
 
         val epsFreeGrammar =
-            if (isEpsGenerating[initial]!!) {
+            if (isEpsGenerating[initial] == true) {
                 val initialWithEps = Symbol.makeSymbol(initial.label + "'")
                 val result = CFGrammar(initialWithEps)
                 result.addProduction(Production(initialWithEps, listOf(Symbol.EPS)))
@@ -169,7 +177,7 @@ class CFGrammar(
             return
         }
         val currentSymbol = products[index]
-        if (isEpsGenerating[currentSymbol]!!) {
+        if (isEpsGenerating[currentSymbol] == true) {
             generateNonEpsProductions(
                     takenProducts, index + 1, production, isEpsGenerating, epsFreeGrammar)
         }
@@ -217,9 +225,9 @@ class CFGrammar(
         return chainFreeGrammar
     }
 
-    private fun removeNonTerminalsInLongProductions(): CFGrammar {
+    private fun removeTerminalsInLongProductions(): CFGrammar {
         val resultGrammar = CFGrammar(initial)
-        val introducedSymbols = mutableSetOf<Symbol>()
+        val newSymbols = mutableSetOf<Symbol>()
         productions.forEach({ symbol, symbolProductions ->
             for (production in symbolProductions) {
                 val products = production.products
@@ -231,8 +239,8 @@ class CFGrammar(
                     products.map { product ->
                         if (product.isTerminal) {
                             val newSymbol = Symbol.makeSymbol(product.label.toUpperCase() + "L")
-                            if (newSymbol !in introducedSymbols) {
-                                introducedSymbols.add(newSymbol)
+                            if (newSymbol !in newSymbols) {
+                                newSymbols.add(newSymbol)
                                 resultGrammar.addProduction(
                                         Production(newSymbol, listOf(product)))
                             }
@@ -289,37 +297,45 @@ class CFGrammar(
                 printProductions(bufferedWriter, symbolProductions)
             }
         })
+        bufferedWriter.flush()
     }
 
     private fun printProductions(bufferedWriter: BufferedWriter, productions: Set<Production>) {
         for (production in productions) {
-            bufferedWriter.appendln(production.products.joinToString(
-                    " ",
-                    production.symbol.label + ": "))
+            bufferedWriter.appendln(production.toString())
         }
     }
 
     companion object {
-        private val WS: String = "[\t ]+"
+        private val WS: String = "\t\n "
+
+        private fun isSymbolToken(token: String) = token.length > 1 && token.endsWith(':')
 
         fun fromText(definition: String): CFGrammar {
-            val productions = definition
-                    .split("\n")
-                    .map {
-                        val (symbolString, result) = it.split(":")
-                        assert(symbolString.length == 1 || symbolString == Symbol.EPS_TEXT,
-                                { "Expected symbol of length 1, but got ${symbolString.length}" })
-                        val symbol = Symbol.makeSymbol(symbolString)
-                        return@map Pair(
-                                symbol,
-                                Production(symbol, result
-                                        .split(WS.toRegex())
-                                        .map { Symbol.makeSymbol(it) }))
-                    }.groupBy { it.first }
-                    .mapValues { it.value.map { pair -> pair.second }.toMutableSet() }
-                    .toMutableMap()
-            val start = definition.takeWhile { it != ':' }
-            return CFGrammar(Symbol.makeSymbol(start), productions)
+            val tokens = definition.split("[$WS]+".toRegex()).filter { it.isNotEmpty() }
+
+            val initial = definition.takeWhile { it != ':' }
+            val resultGrammar = CFGrammar(Symbol.makeSymbol(initial))
+
+            var pos = 0
+            while (pos < tokens.size) {
+                val token = tokens[pos]
+                assert(isSymbolToken(token),
+                        { "Expected a rule definition, but have not found one" })
+                val symbol = Symbol.makeSymbol(token.removeSuffix(":"))
+                pos++
+                val products = mutableListOf<Symbol>()
+
+                while (pos < tokens.size && !isSymbolToken(tokens[pos])) {
+                    products.add(Symbol.makeSymbol(tokens[pos]))
+                    pos++
+                }
+                assert(products.isNotEmpty(),
+                        { "Expected rule productions, but have not found one" })
+                resultGrammar.addProduction(Production(symbol, products))
+            }
+
+            return resultGrammar
         }
     }
 }

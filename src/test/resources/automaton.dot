@@ -1,0 +1,8 @@
+digraph {
+    0 [color="red"]
+    1 [shape="doublecircle"]
+    2 [shape="doublecircle"]
+
+    0 -> 1 [label="b"]
+    1 -> 2 [label="c"]
+}

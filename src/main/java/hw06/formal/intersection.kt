@@ -17,6 +17,30 @@ internal class State private constructor(
             return State(nodeS, symbol, nodeT)
         }
     }
+
+    override fun toString(): String {
+        return "[${nodeS.label()},${symbol.label},${nodeT.label()}]"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as State
+
+        if (nodeS != other.nodeS) return false
+        if (symbol != other.symbol) return false
+        if (nodeT != other.nodeT) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = nodeS.hashCode()
+        result = 31 * result + symbol.hashCode()
+        result = 31 * result + nodeT.hashCode()
+        return result
+    }
 }
 
 class IntersectionCFGrammar(
@@ -26,39 +50,54 @@ class IntersectionCFGrammar(
     private val states = mutableSetOf<State>()
     private val stateQueue = mutableListOf<State>()
 
-    private var intersectionGrammar: CFGrammar = build()
+    private val intersectionGrammar: CFGrammar = initGrammar()
+    private var built = false
 
-    fun get(): CFGrammar = intersectionGrammar
+    fun get(): CFGrammar = when {
+        built -> intersectionGrammar
+        else -> {
+            build()
+            get()
+        }
+    }
 
-    private fun build(): CFGrammar {
-        intersectionGrammar = initGrammar()
+    private fun build() {
+        if (built) {
+            return
+        }
         generateSingleLetterProductions()
         val productionsForProduct = buildProductionsForProduct()
         val nodes = automaton.nodes()
         while (stateQueue.isNotEmpty()) {
             val state = stateQueue.removeAt(0)
-            productionsForProduct[state.symbol]?.forEach { production ->
+            val symbol = state.symbol
+            val nodeS = state.nodeS
+            val nodeT = state.nodeT
+            productionsForProduct[symbol]?.forEach { production ->
                 val products = production.products
-                if (products[0] == state.symbol) {
-                    nodes
-                            .map { Pair(it, State.of(state.nodeT, products[1], it)) }
-                            .filter { it.second in states }
-                            .forEach { reachStateFrom(
-                                    State.of(state.nodeS, production.symbol, it.first),
-                                    state,
-                                    it.second) }
-                } else {
-                    nodes
-                            .map { Pair(it, State.of(it, products[0], state.nodeS)) }
-                            .filter { it.second in states }
-                            .forEach { reachStateFrom(
-                                    State.of(it.first, production.symbol, state.nodeT),
-                                    it.second,
-                                    state) }
+                val firstProduct = products[0]
+                val secondProduct = products[1]
+                val isSymbolFirst = firstProduct == symbol
+                nodes.forEach { complementingNode ->
+                    val complementingState = if (isSymbolFirst)
+                        State.of(nodeT, secondProduct, complementingNode)
+                    else
+                        State.of(complementingNode, firstProduct, nodeS)
+                    if (complementingState in states) {
+                        val unionState = if (isSymbolFirst)
+                            State.of(nodeS, production.symbol, complementingNode)
+                        else
+                            State.of(complementingNode, production.symbol, nodeT)
+                        if (isSymbolFirst) {
+                            reachStateFrom(unionState, state, complementingState)
+                        } else {
+                            reachStateFrom(unionState, complementingState, state)
+                        }
+                    }
                 }
             }
         }
-        return intersectionGrammar
+        built = true
     }
 
     private fun buildProductionsForProduct(): MutableMap<Symbol, MutableSet<Production>> {
@@ -70,9 +109,10 @@ class IntersectionCFGrammar(
                     }
                     .forEach { production ->
                         production.products.forEach { product ->
-                            productionsForProduct
-                                    .withDefault { mutableSetOf() }[product]!!
-                                    .add(production)
+                            if (product !in productionsForProduct) {
+                                productionsForProduct[product] = mutableSetOf()
+                            }
+                            productionsForProduct[product]!!.add(production)
                         }
                     }
         })
@@ -88,10 +128,12 @@ class IntersectionCFGrammar(
                 val nodeF = linkToNode(link)
                 terminals[label]?.forEach { terminal ->
                     val state = State.of(nodeS, terminal, nodeF)
+
                     reachStateFrom(state, null, null)
-                    intersectionGrammar.addProduction(Production(
+                    val newProduction = Production(
                             Symbol.makeSymbol(state.toString()),
-                            listOf(Symbol.makeSymbol(label))))
+                            listOf(Symbol.makeSymbol(label)))
+                    intersectionGrammar.addProduction(newProduction)
                 }
             }
         }
@@ -104,7 +146,12 @@ class IntersectionCFGrammar(
                     .filter { it.products.size == 1 }
                     .map { it.products[0] }
                     .filter { it.isTerminal }
-                    .forEach { terminals.withDefault { mutableSetOf() }[it.label]!!.add(symbol) }
+                    .forEach {
+                        if (it.label !in terminals) {
+                            terminals[it.label] = mutableSetOf()
+                        }
+                        terminals[it.label]!!.add(symbol)
+                    }
         })
         return terminals
     }
@@ -149,12 +196,10 @@ class IntersectionCFGrammar(
     }
 
     private fun findStartNode(): MutableNode {
-        val startNodes = findNodesShaped(START_SHAPE_LABEL)
-        if (startNodes.isEmpty()) {
-            error("No start nodes.")
-        }
-        if (startNodes.size > 1) {
-            error("More than one start node.")
+        val startNodes = findNodesColored(START_COLOR_LABEL)
+        when {
+            startNodes.isEmpty() -> error("No start nodes.")
+            startNodes.size > 1  -> error("More than one start node.")
         }
         return startNodes[0]
     }
@@ -172,21 +217,30 @@ class IntersectionCFGrammar(
                 .filter({ node -> shapeLabel == nodeGetShape(node) })
     }
 
+    private fun findNodesColored(colorLabel: String): List<MutableNode> {
+        return automaton.nodes()
+                .filter({ node -> colorLabel == nodeGetColor(node) })
+    }
+
     companion object {
-        private val START_SHAPE_LABEL = "plaintext"
+        private val START_COLOR_LABEL = "red"
         private val TERMINAL_SHAPE_LABEL = "doublecircle"
 
         private fun nodeGetShape(node: MutableNode): String? {
             return getAttrValue(node.attrs(), "shape")
         }
 
+        private fun nodeGetColor(node: MutableNode): String? {
+            return getAttrValue(node.attrs(), "color")
+        }
+
         private fun linkGetLabel(link: Link): String {
-            return getAttrValue(link.attrs(), "symbol") ?:
+            return getAttrValue(link.attrs(), "label") ?:
                     error("Link without a symbol!")
         }
 
         private fun <T> getAttrValue(attrs: MutableAttributed<T>, label: String): String? {
-            return attrs.filter { it.key == label }[0].value.toString()
+            return attrs.firstOrNull { it.key == label }?.value.toString()
         }
 
         private fun linkFromNode(link: Link): MutableNode {
