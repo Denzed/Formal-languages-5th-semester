@@ -12,6 +12,8 @@ import symbols.*;
 %eofclose
 
 %{
+StringBuilder comment = new StringBuilder();
+
 public static void main(String argv[]) {
     for (int i = 0; i < argv.length; i++) {
         try {
@@ -26,8 +28,8 @@ public static void main(String argv[]) {
                 sb = sb.append(symb).append("; ");
             }
             System.out.println(sb.toString());
-        } catch (Exception e) {
-            e.printStackTrace(System.out);
+        } catch (Throwable e) {
+            System.err.println(e.getMessage());
             System.exit(1);
         }
     }
@@ -52,6 +54,10 @@ public Separator separator(String type) {
 public Identifier identifier(String name) {
     return new Identifier(name, yyline, yycolumn, yycolumn + yytext().length() - 1);
 }
+
+public Comment comment(String text) {
+    return new Comment(text.trim(), yyline, yycolumn, yycolumn + yytext().length() - 1);
+}
 %}
 
 // spaces and lines
@@ -60,7 +66,9 @@ Whitespace = {LineTerminator} | [ \t\f]
 
 // comments
 NotLineTerminator = [^\r\n]
-Comment = "//" {NotLineTerminator}* {LineTerminator}?
+CommentStart = "//"
+CommentBody = {NotLineTerminator}*
+CommentEnd = {LineTerminator}?
 
 // identifiers
 Identifier = [_a-z][_a-z0-9]*
@@ -79,56 +87,77 @@ Digits = {Digit} | {Digit} {DigitsAndUnderscores}? {Digit}
 Digit = [0-9]
 DigitsAndUnderscores = ({Digit} | _)+
 
+%x AFTER_LEXEM
+%x COMMENT
 %%
 
 <YYINITIAL> {
 
   // keywords
-  "if"                           { return keyword("If"); }
-  "then"                         { return keyword("Then"); }
-  "else"                         { return keyword("Else"); }
-  "while"                        { return keyword("While"); }
-  "do"                           { return keyword("Do"); }
-  "read"                         { return keyword("Read"); }
-  "write"                        { return keyword("Write"); }
-  "begin"                        { return keyword("Begin"); }
-  "end"                          { return keyword("End"); }
+  "if"                           { yybegin(AFTER_LEXEM); return keyword("If"); }
+  "then"                         { yybegin(AFTER_LEXEM); return keyword("Then"); }
+  "else"                         { yybegin(AFTER_LEXEM); return keyword("Else"); }
+  "while"                        { yybegin(AFTER_LEXEM); return keyword("While"); }
+  "do"                           { yybegin(AFTER_LEXEM); return keyword("Do"); }
+  "read"                         { yybegin(AFTER_LEXEM); return keyword("Read"); }
+  "write"                        { yybegin(AFTER_LEXEM); return keyword("Write"); }
+  "begin"                        { yybegin(AFTER_LEXEM); return keyword("Begin"); }
+  "end"                          { yybegin(AFTER_LEXEM); return keyword("End"); }
     
   // boolean literals
-  "true"                         { return literal("Bool", Boolean.toString(true)); }
-  "false"                        { return literal("Bool", Boolean.toString(false)); }
+  "true"                         { yybegin(AFTER_LEXEM); return literal("Bool", Boolean.toString(true)); }
+  "false"                        { yybegin(AFTER_LEXEM); return literal("Bool", Boolean.toString(false)); }
+  
+  // operators
+  ":="                           { yybegin(AFTER_LEXEM); return operator("Assign"); }
+  "+"                            { yybegin(AFTER_LEXEM); return operator("Plus"); }
+  "-"                            { yybegin(AFTER_LEXEM); return operator("Minus"); }
+  "*"                            { yybegin(AFTER_LEXEM); return operator("Mult"); }
+  "/"                            { yybegin(AFTER_LEXEM); return operator("Div"); }
+  "%"                            { yybegin(AFTER_LEXEM); return operator("Mod"); }
+  "=="                           { yybegin(AFTER_LEXEM); return operator("Eq"); }
+  "!="                           { yybegin(AFTER_LEXEM); return operator("NotEq"); }
+  ">"                            { yybegin(AFTER_LEXEM); return operator("GT"); }
+  ">="                           { yybegin(AFTER_LEXEM); return operator("GTEq"); }
+  "<"                            { yybegin(AFTER_LEXEM); return operator("LT"); }
+  "<="                           { yybegin(AFTER_LEXEM); return operator("LTEq"); }
+  "&&"                           { yybegin(AFTER_LEXEM); return operator("LAnd"); }
+  "||"                           { yybegin(AFTER_LEXEM); return operator("LOr"); }
+
+  // numeric literals
+  {NumLiteral}                   { yybegin(AFTER_LEXEM); return literal("Num", Float.toString(new Float(yytext().replaceAll("_", "")))); }
+
+  // identifiers
+  {Identifier}                   { yybegin(AFTER_LEXEM); return identifier(yytext()); }
+
+  // comment
+  {CommentStart}                 { yybegin(COMMENT); }
   
   // separators
   "("                            { return separator("LParen"); }
   ")"                            { return separator("RParen"); }
   ";"                            { return separator("Colon"); }
-  
-  // operators
-  "+"                            { return operator("Plus"); }
-  "-"                            { return operator("Minus"); }
-  "*"                            { return operator("Mult"); }
-  "/"                            { return operator("Div"); }
-  "%"                            { return operator("Mod"); }
-  "=="                           { return operator("Eq"); }
-  "!="                           { return operator("NotEq"); }
-  ">"                            { return operator("GT"); }
-  ">="                           { return operator("GTEq"); }
-  "<"                            { return operator("LT"); }
-  "<="                           { return operator("LTEq"); }
-  "&&"                           { return operator("LAnd"); }
-  "||"                           { return operator("LOr"); }
 
-  // numeric literals
-  {NumLiteral}                   { return literal("Num", Float.toString(new Float(yytext().replaceAll("_", "")))); }
-  
+  // whitespaces
+  {Whitespace}                   { }
+}
+
+<AFTER_LEXEM> {
   // comment
-  {Comment}                      {}
+  {CommentStart}                 { yybegin(COMMENT); }
 
-  // whitespace
-  {Whitespace}                   {}
+  // separators
+  "("                            { yybegin(YYINITIAL); return separator("LParen"); }
+  ")"                            { yybegin(YYINITIAL); return separator("RParen"); }
+  ";"                            { yybegin(YYINITIAL); return separator("Colon"); }
 
-  // identifiers
-  {Identifier}                   { return identifier(yytext()); }
+  // whitespaces
+  {Whitespace}+                  { yybegin(YYINITIAL); }
+}
+
+<COMMENT> {
+  {CommentBody}                  { return comment(yytext()); }
+  {CommentEnd}                   { yybegin(YYINITIAL); }
 }
 
 // errors

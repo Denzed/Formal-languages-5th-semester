@@ -1,7 +1,7 @@
 // some random comment
  	// different whitespaces \s \t
-_lfanfkan_341341 // identificator
+_lfanfkan_341341 // identifier
 if then else while do read write begin end // keywords
 true false 1e1 1e+1 1e-1 1E1 1E+1 1E-1 .1 .1e1 1. 1.1 1.e1 1.1e1 1e0_1 1 1_1 // literals
-+ - * / % == != > >= < <= && || // operators
++ - * / % == != > >= < <= && || := // operators
 (); // delimiters 
