@@ -75,7 +75,7 @@ CommentEnd = {LineTerminator}?
 Identifier = [_a-z][_a-z0-9]*
 
 // numeric literals
-NumLiteral = {Integer} | {NumLiteral1} | {NumLiteral2} | {NumLiteral3}
+NumLiteral = {Sign}? ({Integer} | {NumLiteral1} | {NumLiteral2} | {NumLiteral3})
 
 NumLiteral1 = {Digits} \. {Digits}? {ExponentPart}?
 NumLiteral2 = \. {Digits} {ExponentPart}?
@@ -83,6 +83,7 @@ NumLiteral3 = {Digits} {ExponentPart}
 
 ExponentPart = [eE] [\+-]? {Digits}
 
+Sign = [+-]
 Integer = 0 | [1-9] ({Digits}? | _+ {Digits})
 Digits = {Digit} | {Digit} {DigitsAndUnderscores}? {Digit}
 Digit = [0-9]
