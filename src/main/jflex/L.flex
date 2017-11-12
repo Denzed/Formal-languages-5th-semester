@@ -89,6 +89,8 @@ Digits = {Digit} | {Digit} {DigitsAndUnderscores}? {Digit}
 Digit = [0-9]
 DigitsAndUnderscores = ({Digit} | _)+
 
+UnexpectedCharacter = .
+
 %x AFTER_LEXEM
 %x COMMENT
 %%
@@ -142,6 +144,9 @@ DigitsAndUnderscores = ({Digit} | _)+
 
   // whitespaces
   {Whitespace}                   { }
+
+  // errors
+  {UnexpectedCharacter}          { throw new Error(String.format("Unexpected character <%s> at (%d, %d)", yytext(), yyline, yycolumn)); }
 }
 
 <AFTER_LEXEM> {
@@ -155,12 +160,15 @@ DigitsAndUnderscores = ({Digit} | _)+
 
   // whitespaces
   {Whitespace}+                  { yybegin(YYINITIAL); }
+
+  // errors
+  {UnexpectedCharacter}          { throw new Error(String.format("Unexpected character <%s> at (%d, %d)", yytext(), yyline, yycolumn)); }
 }
 
 <COMMENT> {
   {CommentBody}                  { return comment(yytext()); }
   {CommentEnd}                   { yybegin(YYINITIAL); }
-}
 
-// errors
-[^]                              { throw new Error(String.format("Illegal character <%s> at (%d, %d)", yytext(), yyline, yycolumn)); }
+  // errors
+  {UnexpectedCharacter}          { throw new Error(String.format("Unexpected character <%s> at (%d, %d)", yytext(), yyline, yycolumn)); }
+}
