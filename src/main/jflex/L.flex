@@ -17,7 +17,7 @@ StringBuilder comment = new StringBuilder();
 public static void main(String argv[]) {
     for (int i = 0; i < argv.length; i++) {
         try {
-            System.out.println("Parsing ["+argv[i]+"]");
+            System.err.println("Parsing ["+argv[i]+"]");
             LLexer l = new LLexer(new FileReader(argv[i]));
             StringBuilder sb = new StringBuilder();
             while (true) {
@@ -27,6 +27,7 @@ public static void main(String argv[]) {
                 }
                 sb = sb.append(symb).append("; ");
             }
+            System.err.println("Finished successfully");
             System.out.println(sb.toString());
         } catch (Throwable e) {
             System.err.println(e.getMessage());
