@@ -1,0 +1,25 @@
+write 1 + 2 - 3 * 4 / 5 % 6 == 7
+write 7 != 8
+write 8 > 9
+write 9 >= 10
+write 10 < 11
+write 11 <= 12
+write 12 && 13 || 14
+var x = 1
+fun y(z) {
+    write x
+}
+y(x)
+read x
+x = 2
+while (1) {
+    y(1)
+}
+if (1) {
+    y(2)
+}
+if (1) {
+    y(3)
+} else {
+    y(4)
+}
