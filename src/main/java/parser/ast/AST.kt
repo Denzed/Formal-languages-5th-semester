@@ -86,7 +86,9 @@ private class PlantUMLConverter(val root: ASTNode) {
                 "position: ${definition.position}"
         )
         addVertex(id, "variable definition", description, emptyList())
-        addEdge(id, dfs(definition.value), "value")
+        if (definition.value != null) {
+            addEdge(id, dfs(definition.value), "value")
+        }
         return id
     }
 

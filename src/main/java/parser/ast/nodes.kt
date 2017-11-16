@@ -40,10 +40,15 @@ data class FunctionDefinition(
 data class VariableDefinition(
         override val position: Pair<Int,Int>,
         val identifier: Identifier,
-        val value: Expression
+        val value: Expression?
 ) : Statement() {
     override fun toString(): String {
-        return "val $identifier = $value"
+        return buildString {
+            append("val $identifier")
+            if (value != null) {
+                append(" = $value")
+            }
+        }
     }
 }
 

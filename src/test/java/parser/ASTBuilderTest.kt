@@ -67,7 +67,7 @@ private object PositionIndependentASTConverter {
             VariableDefinition(
                     blankPosition,
                     dfsIdentifier(definition.identifier),
-                    dfsExpression(definition.value)
+                    definition.value?.let(this::dfsExpression)
             )
 
     private fun dfsReadStatement(statement: ReadStatement): Statement =

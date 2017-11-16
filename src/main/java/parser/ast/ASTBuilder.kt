@@ -50,7 +50,7 @@ private object StatementBuilder : LBaseVisitor<Statement>() {
             context: LParser.VariableDefinitionContext
     ): VariableDefinition {
         val identifier = makeIdentifier(context.identifier())
-        val expression = makeExpression(context.expression())
+        val expression = context.expression()?.let { makeExpression(it) }
         return VariableDefinition(
                 getStartPosition(context),
                 identifier,

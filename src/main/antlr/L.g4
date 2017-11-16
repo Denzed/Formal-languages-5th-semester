@@ -39,7 +39,7 @@ FUN_DEF
     ;
 
 variableDefinition
-    :   VAR_DEF identifier ASSIGN expression
+    :   VAR_DEF identifier (ASSIGN expression)?
     ;
 
 ASSIGN
