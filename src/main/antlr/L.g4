@@ -192,7 +192,7 @@ ADD
 binaryExpressionOfPrecedence8
     :   left = binaryExpressionOfPrecedence6
         op = ( LT | LE | GT | GE )
-        right = binaryExpressionOfPrecedence6   #op8Expr
+        right = binaryExpressionOfPrecedence8   #op8Expr
     |   binaryExpressionOfPrecedence6           #atom8Expr
     ;
 
@@ -215,7 +215,7 @@ LT
 binaryExpressionOfPrecedence9
     :   left = binaryExpressionOfPrecedence8
         op = ( EQ | NEQ )
-        right = binaryExpressionOfPrecedence8   #op9Expr
+        right = binaryExpressionOfPrecedence9   #op9Expr
     |   binaryExpressionOfPrecedence8           #atom9Expr
     ;
 
