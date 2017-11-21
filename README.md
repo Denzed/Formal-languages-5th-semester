@@ -22,7 +22,7 @@ variableAssignment = identifier '=' expression
 
 expression = binaryExpression | atomicExpression
 
-atomicExpression identifier | literal | '(' expression ')'
+atomicExpression = identifier | literal | '(' expression ')'
 
 functionCall = identifier '(' parameters ')'
 
@@ -34,7 +34,10 @@ literal = number
 
 number = \[1-9\]\[0-9\]*
 
-binaryExpression = expression op expression
+binaryExpression(prec) = binaryExpression(prec - 1) op(prec) binaryExpression(prec) | binaryExpression(prec - 1)
+binaryExpression(minPrec) = atomicExpression op(minPrec) binaryExpression(minPrec)
+
+Operators have precedences like those in C
 
 op = AR_OP | LOG_OP
 
@@ -47,6 +50,7 @@ comment = line_comment | multiline_comment
 line_comment = '//' ~[\r\n]*
 
 multiline_comment = '/\*' .* '\*/'
+
 
 ## Parser
 
@@ -61,9 +65,10 @@ Resulting JAR-file can be found at `./build/libs/hw07-1.0-SNAPSHOT.jar`
 ### Running
 Usage: `java -jar hw07-1.0-SNAPSHOT.jar command inputFile [outputFile={inputFile}.out]`
 Commands:
-- `lex` -- splits given code to tokens
-- `ast` -- builds AST from given code
-- `help` -- outputs this text
+    lex -- splits given code to tokens
+    ast -- builds AST from given code and outputs it as an SVG image
+       if output file's extension is ".svg" or a PlantUML diagram instead.
+    help -- outputs this text
 
 ### Example output
 
@@ -79,40 +84,40 @@ will yield
 ```PlantUML
 @startuml
 state "code block" as 0 {
-state "function definition" as 1
-1: name: "y"
-1: position: (0, 0)
-1: z
-state "code block" as 2 {
-state "variable definition" as 3
-3: name: "x"
-3: position: (1, 4)
-state "number" as 4
-4: position: (1, 12)
-4: value: 1
-3 --> 4: value
-||
-state "read" as 5
-5: position: (2, 4)
-5: identifier: "x"
-||
-state "write" as 6
-6: position: (3, 4)
-state "binary expression" as 7
-7: position: (3, 10)
-7: operator: "+"
-state "identifier reference" as 8
-8: name: "z"
-8: position: (3, 10)
-7 --> 8: left
-state "identifier reference" as 9
-9: name: "x"
-9: position: (3, 14)
-7 --> 9: right
-6 --> 7: value
-}
-2: position: (1, 4)
-1 --> 2: body
+  state "function definition" as 1
+  1: name: "y"
+  1: position: (0, 0)
+  1: z
+  state "code block" as 2 {
+    state "variable definition" as 3
+    3: name: "x"
+    3: position: (1, 4)
+    state "number" as 4
+    4: position: (1, 12)
+    4: value: 1
+    3 --> 4: value
+    ||
+    state "read" as 5
+    5: position: (2, 4)
+    5: identifier: "x"
+    ||
+    state "write" as 6
+    6: position: (3, 4)
+    state "binary expression" as 7
+    7: position: (3, 10)
+    7: operator: "+"
+    state "identifier reference" as 8
+    8: name: "z"
+    8: position: (3, 10)
+    7 --> 8: left
+    state "identifier reference" as 9
+    9: name: "x"
+    9: position: (3, 14)
+    7 --> 9: right
+    6 --> 7: value
+  }
+  2: position: (1, 4)
+  1 --> 2: body
 }
 0: position: (0, 0)
 @enduml

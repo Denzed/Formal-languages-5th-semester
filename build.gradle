@@ -2,7 +2,7 @@ group 'Formal languages'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.1.51'
+    ext.kotlin_version = '1.1.60'
 
     repositories {
         mavenCentral()
@@ -31,6 +31,7 @@ compileJava.dependsOn generateGrammarSource
 compileKotlin.dependsOn generateGrammarSource
 
 dependencies {
+    compile group: 'net.sourceforge.plantuml', name: 'plantuml', version: '8059'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"

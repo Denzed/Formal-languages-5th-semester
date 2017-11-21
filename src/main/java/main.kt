@@ -1,20 +1,26 @@
 
+import net.sourceforge.plantuml.FileFormat
+import net.sourceforge.plantuml.FileFormatOption
+import net.sourceforge.plantuml.SourceStringReader
 import parser.astFromCode
 import parser.tokensFromCode
+import java.io.ByteArrayOutputStream
 import java.io.File
+
+
 
 fun printHelp(message: String = "") {
     if (message.isNotEmpty()) {
         println(message)
     }
-    println(
-            buildString {
-                appendln("Usage: command inputFile [outputFile={inputFile}.out]")
-                appendln("Commands: ")
-                appendln("    lex -- splits given code to tokens")
-                appendln("    ast -- builds AST from given code")
-                appendln("    help -- outputs this text")
-            }
+    println("""
+            |Usage: command inputFile [outputFile={inputFile}.out]
+            |Commands:
+            |    lex -- splits given code to tokens
+            |    ast -- builds AST from given code and outputs it as an SVG image
+            |       if output file's extension is ".svg" or a PlantUML diagram instead.
+            |    help -- outputs this text
+            """.trimMargin()
     )
 }
 
@@ -49,5 +55,21 @@ fun main(args: Array<String>) {
         return
     }
     val outputFile = File(if (args.size > 2) args[2] else "$inputFile.out")
-    outputFile.writeText(output)
+    if (args[0] == "ast" && outputFile.extension == "svg") {
+        println("Generating image")
+        val outputStream = ByteArrayOutputStream()
+        // Write the first image to "os"
+        val desc = SourceStringReader(output).generateImage(
+                outputStream,
+                FileFormatOption(FileFormat.SVG)
+        )
+        if (desc != null && desc.isNotEmpty()) {
+            println(desc)
+        }
+        outputStream.close()
+
+        outputFile.writeBytes(outputStream.toByteArray())
+    } else {
+        outputFile.writeText(output)
+    }
 }
