@@ -20,6 +20,8 @@ if (1) {
 }
 if (1) {
     y(3)
-} else {
+} else { /* multi-line comment
+
+         */
     y(4)
-}
+} // single-line

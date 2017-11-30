@@ -4,6 +4,15 @@ abstract class ASTNode {
     abstract val position: Pair<Int,Int>
 }
 
+data class File(
+        override val position: Pair<Int,Int>,
+        val block: Block
+) : ASTNode() {
+    override fun toString(): String {
+        return "$block"
+    }
+}
+
 data class Block(
         override val position: Pair<Int,Int>,
         val statements: List<Statement>

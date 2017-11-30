@@ -1,7 +1,7 @@
 package parser
 
-import org.antlr.v4.runtime.BufferedTokenStream
 import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
 import parser.ast.AST
 import parser.ast.ASTBuilder
 
@@ -24,6 +24,7 @@ fun tokensFromCode(code: String): List<MyToken> {
 
 fun astFromCode(code: String): AST {
     val lexer = LLexer(CharStreams.fromString(code))
-    val parser = LParser(BufferedTokenStream(lexer))
-    return AST(ASTBuilder.visit(parser.block()))
+    val parser = LParser(CommonTokenStream(lexer))
+    parser.addErrorListener(ParseErrorListener)
+    return AST(ASTBuilder.visit(parser.file()))
 }

@@ -49,7 +49,7 @@ comment = line_comment | multiline_comment
 
 line_comment = '//' ~[\r\n]*
 
-multiline_comment = '/\*' .* '\*/'
+    multiline_comment = '/\*' ^'\*' '\*/'
 
 
 ## Parser

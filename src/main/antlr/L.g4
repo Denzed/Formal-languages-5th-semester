@@ -1,5 +1,10 @@
 grammar L;
 
+file
+    :   block
+        EOF
+    ;
+
 block
     :   (  statement
         )*
@@ -283,14 +288,22 @@ WS
     ;
 
 COMMENT
-    :   LINE_COMMENT
-    |   MULTILINE_COMMENT
+    :
+    (
+    LINE_COMMENT
+    |
+    MULTILINE_COMMENT
+    ) -> channel(HIDDEN)
     ;
 
-LINE_COMMENT
+fragment LINE_COMMENT
     : '//' ~[\r\n]*
     ;
 
-MULTILINE_COMMENT
-    : '/*' .*? '*/'
+fragment MULTILINE_COMMENT
+    : '/*' NOT_MULTILINE_COMMENT_END '*/'
+    ;
+
+fragment NOT_MULTILINE_COMMENT_END
+    : ( ~'*' | ( '*'+ ~[/*]) )* '*'*
     ;

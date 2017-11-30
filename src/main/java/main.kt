@@ -39,8 +39,8 @@ fun main(args: Array<String>) {
         return
     }
     val code = inputFile.inputStream().bufferedReader().use { it.readText() }
-    val output = try {
-        when (args[0]) {
+    try {
+        val output = when (args[0]) {
             "lex" -> tokensFromCode(code).joinToString()
             "ast" -> astFromCode(code).toPlantUML()
             else -> {
@@ -48,28 +48,27 @@ fun main(args: Array<String>) {
                 return
             }
         }
-    } catch (t: Throwable) {
-        println(t.message ?:
-                "An unknown error occurred. Here is the stack trace just in case:\n" +
-                        "${t.stackTrace}")
-        return
-    }
-    val outputFile = File(if (args.size > 2) args[2] else "$inputFile.out")
-    if (args[0] == "ast" && outputFile.extension == "svg") {
-        println("Generating image")
-        val outputStream = ByteArrayOutputStream()
-        // Write the first image to "os"
-        val desc = SourceStringReader(output).generateImage(
-                outputStream,
-                FileFormatOption(FileFormat.SVG)
-        )
-        if (desc != null && desc.isNotEmpty()) {
-            println(desc)
-        }
-        outputStream.close()
+        val outputFile = File(if (args.size > 2) args[2] else "$inputFile.out")
+        if (args[0] == "ast" && outputFile.extension == "svg") {
+            println("Generating image")
+            val outputStream = ByteArrayOutputStream()
+            // Write the first image to "os"
+            val desc = SourceStringReader(output).generateImage(
+                    outputStream,
+                    FileFormatOption(FileFormat.SVG)
+            )
+            if (desc != null && desc.isNotEmpty()) {
+                println(desc)
+            }
+            outputStream.close()
 
-        outputFile.writeBytes(outputStream.toByteArray())
-    } else {
-        outputFile.writeText(output)
+            outputFile.writeBytes(outputStream.toByteArray())
+        } else {
+            outputFile.writeText(output)
+        }
+    } catch (e: Exception) {
+        println(e.message ?:
+                "An unknown error occurred. Here is the stack trace just in case:\n" +
+                        "${e.stackTrace}")
     }
 }

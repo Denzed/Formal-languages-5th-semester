@@ -252,13 +252,13 @@ state "code block" as 0 {
   state "code block" as 67 {
     state "function call" as 68
     68: name: "y"
-    68: position: (23, 4)
+    68: position: (25, 4)
     state "number" as 69
-    69: position: (23, 6)
+    69: position: (25, 6)
     69: value: 4
     68 --> 69: parameter #0
   }
-  67: position: (23, 4)
+  67: position: (25, 4)
   62 --> 67: else
 }
 0: position: (0, 0)

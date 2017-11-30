@@ -9,6 +9,12 @@ private fun getStartPosition(context: ParserRuleContext): Pair<Int,Int> {
 }
 
 object ASTBuilder : LBaseVisitor<ASTNode>() {
+    override fun visitFile(context: LParser.FileContext): File =
+            File(
+                    getStartPosition(context),
+                    visitBlock(context.block())
+            )
+
     override fun visitBlock(context: LParser.BlockContext): Block =
             Block(
                     getStartPosition(context),

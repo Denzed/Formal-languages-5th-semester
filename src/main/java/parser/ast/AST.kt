@@ -55,6 +55,8 @@ private class PlantUMLConverter(val root: ASTNode) {
         description.mapTo(intermediateResult) { "${indent(indent)}$id: $it" }
     }
 
+    private fun dfsFile(file: File, indent: Int): Int = dfsBlock(file.block, indent)
+
     private fun dfsBlock(block: Block, indent: Int): Int {
         val id = nodeCount++
         addVertex(
@@ -216,6 +218,7 @@ private class PlantUMLConverter(val root: ASTNode) {
     }
 
     private fun dfs(node: ASTNode, indent: Int): Int = when (node) {
+        is File -> dfsFile(node, indent)
         is Block -> dfsBlock(node, indent)
         is BracedBlock -> dfs(node.underlyingBlock, indent)
         is FunctionDefinition -> dfsFunctionDefinition(node, indent)

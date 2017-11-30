@@ -16,6 +16,7 @@ private object PositionIndependentASTConverter {
     fun convertAST(ast: AST): AST = AST(dfs(ast.root))
 
     private fun dfs(node: ASTNode): ASTNode = when (node) {
+        is File -> dfsBlock(node.block)
         is Block -> dfsBlock(node)
         is BracedBlock -> dfsBracedBlock(node)
         else -> error("Unknown AST node type at ${node.position}")
