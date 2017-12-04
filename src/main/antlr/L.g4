@@ -284,7 +284,7 @@ Number
     ;
 
 WS
-    :   (' ' | '\t' | '\r'| '\n') -> skip
+    :   (' ' | '\t' | '\r'| '\n') -> channel(HIDDEN)
     ;
 
 COMMENT
@@ -301,7 +301,13 @@ fragment LINE_COMMENT
     ;
 
 fragment MULTILINE_COMMENT
-    : '/*' NOT_MULTILINE_COMMENT_END '*/'
+    : '/*'
+    NOT_MULTILINE_COMMENT_END
+    (
+    MULTILINE_COMMENT
+    NOT_MULTILINE_COMMENT_END
+    )*
+    '*/'
     ;
 
 fragment NOT_MULTILINE_COMMENT_END

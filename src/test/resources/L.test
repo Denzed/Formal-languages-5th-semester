@@ -25,3 +25,4 @@ if (1) {
          */
     y(4)
 } // single-line
+/* comment /* inside */ comment */

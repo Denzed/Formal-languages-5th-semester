@@ -38,7 +38,7 @@ fun main(args: Array<String>) {
         println("Cannot read file")
         return
     }
-    val code = inputFile.inputStream().bufferedReader().use { it.readText() }
+    val code = inputFile.readText()
     try {
         val output = when (args[0]) {
             "lex" -> tokensFromCode(code).joinToString()
