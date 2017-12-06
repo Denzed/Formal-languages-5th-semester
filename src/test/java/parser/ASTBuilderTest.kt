@@ -41,7 +41,7 @@ private object PositionIndependentASTConverter {
             is WhileCycle -> dfsWhileCycle(node)
             is IfClause -> dfsIfClause(node)
             is VariableAssignment -> dfsVariableAssignment(node)
-            is FunctionCall -> dfsFunctionCall(node)
+            is FunctionCallStatement -> dfsFunctionCallStatement(node)
             else -> error("Unknown AST node type at ${node.position}")
         }
     }
@@ -105,8 +105,8 @@ private object PositionIndependentASTConverter {
                     dfsExpression(assignment.newValue)
             )
 
-    private fun dfsFunctionCall(call: FunctionCall): Statement =
-            FunctionCall(
+    private fun dfsFunctionCallStatement(call: FunctionCallStatement): Statement =
+            FunctionCallStatement(
                     blankPosition,
                     dfsIdentifier(call.identifier),
                     call.parameters.map(this::dfsExpression)
@@ -221,7 +221,7 @@ class ASTBuilderTest {
 
         val expectedTree = AST(
                 Block(blankPosition,
-                        mutableListOf(FunctionCall(
+                        mutableListOf(FunctionCallStatement(
                                 blankPosition,
                                 Identifier(blankPosition, "sum"),
                                 mutableListOf(

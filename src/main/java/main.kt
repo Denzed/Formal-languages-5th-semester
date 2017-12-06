@@ -67,8 +67,11 @@ fun main(args: Array<String>) {
             outputFile.writeText(output)
         }
     } catch (e: Exception) {
-        println(e.message ?:
-                "An unknown error occurred. Here is the stack trace just in case:\n" +
-                        "${e.stackTrace}")
+        if (e.message == null) {
+            println("An unknown error \"${e.javaClass.name}\" occurred.")
+            e.printStackTrace()
+        } else {
+            println(e.message)
+        }
     }
 }

@@ -9,7 +9,7 @@ import org.antlr.v4.runtime.misc.ParseCancellationException
 object ParseErrorListener : BaseErrorListener() {
     override fun syntaxError(
             recognizer: Recognizer<*, *>,
-            offendingSymbol: Any,
+            offendingSymbol: Any?,
             line: Int,
             charPositionInLine: Int,
             msg: String,

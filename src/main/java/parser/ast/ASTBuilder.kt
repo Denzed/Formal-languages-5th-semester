@@ -64,6 +64,18 @@ private object StatementBuilder : LBaseVisitor<Statement>() {
         )
     }
 
+    override fun visitFunctionCall(
+            context: LParser.FunctionCallContext
+    ): FunctionCallStatement {
+        val identifier = makeIdentifier(context.identifier())
+        val arguments = context
+                .parameters()
+                .expression()
+                .map { subContext -> makeExpression(subContext) }
+
+        return FunctionCallStatement(getStartPosition(context), identifier, arguments)
+    }
+
     override fun visitWhileCycle(context: LParser.WhileCycleContext): WhileCycle {
         return WhileCycle(
                 getStartPosition(context),
@@ -116,16 +128,6 @@ private object StatementBuilder : LBaseVisitor<Statement>() {
                 makeExpression(context.expression())
         )
     }
-
-    override fun visitFunctionCall(context: LParser.FunctionCallContext): FunctionCall {
-        val identifier = makeIdentifier(context.identifier())
-        val arguments = context
-                .parameters()
-                .expression()
-                .map { subContext -> makeExpression(subContext) }
-
-        return FunctionCall(getStartPosition(context), identifier, arguments)
-    }
 }
 
 private object ExpressionBuilder : LBaseVisitor<Expression>() {
@@ -142,6 +144,16 @@ private object ExpressionBuilder : LBaseVisitor<Expression>() {
                             error("Unknown operator: \"$opString\""),
                     right
             )
+
+    override fun visitFunctionCall(context: LParser.FunctionCallContext): FunctionCall {
+        val identifier = visitIdentifier(context.identifier())
+        val arguments = context
+                .parameters()
+                .expression()
+                .map { subContext -> visitExpression(subContext) }
+
+        return FunctionCall(getStartPosition(context), identifier, arguments)
+    }
 
     override fun visitBracedExpression(context: LParser.BracedExpressionContext): BracedExpression {
         return BracedExpression(getStartPosition(context), visitExpression(context.expression()))

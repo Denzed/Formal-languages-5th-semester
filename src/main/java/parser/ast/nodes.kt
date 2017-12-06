@@ -79,6 +79,15 @@ data class WriteStatement(
     }
 }
 
+data class FunctionCallStatement(
+        override val position: Pair<Int,Int>,
+        val identifier: Identifier,
+        val parameters: List<Expression>
+) : Statement() {
+    override fun toString(): String {
+        return "$identifier(${parameters.joinToString()})"
+    }
+}
 
 abstract class Expression: ASTNode()
 
@@ -114,17 +123,17 @@ data class VariableAssignment(
     }
 }
 
+abstract class AtomicExpression: Expression()
+
 data class FunctionCall(
         override val position: Pair<Int,Int>,
         val identifier: Identifier,
         val parameters: List<Expression>
-) : Statement() {
+) : AtomicExpression() {
     override fun toString(): String {
         return "$identifier(${parameters.joinToString()})"
     }
 }
-
-abstract class AtomicExpression: Expression()
 
 data class Identifier(
         override val position: Pair<Int,Int>,

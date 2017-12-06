@@ -28,6 +28,8 @@ fun tokensFromCode(code: String): List<MyToken> {
 
 fun astFromCode(code: String): AST {
     val lexer = LLexer(CharStreams.fromString(code))
+    lexer.removeErrorListeners()
+    lexer.addErrorListener(ParseErrorListener)
     val parser = LParser(CommonTokenStream(lexer))
     parser.removeErrorListeners()
     parser.addErrorListener(ParseErrorListener)

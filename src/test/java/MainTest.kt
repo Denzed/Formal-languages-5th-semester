@@ -14,7 +14,7 @@ class MainTest {
     @Before
     fun setUpStreams() {
         System.setErr(PrintStream(errContent))
-        System.setOut(PrintStream(errContent))
+//        System.setOut(PrintStream(errContent))
     }
 
     @After
@@ -24,7 +24,7 @@ class MainTest {
         assertEquals(0, outContent.size(), outContent.toString())
         outContent.reset()
         System.setErr(null)
-        System.setOut(null)
+//        System.setOut(null)
     }
 
     @Test

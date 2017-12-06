@@ -4,84 +4,84 @@ state "code block" as 0 {
   1: position: (0, 0)
   state "binary expression" as 2
   2: position: (0, 6)
-  2: operator: "=="
-  state "binary expression" as 3
+  2: operator: "+"
+  state "function call" as 3
+  3: name: "kek"
   3: position: (0, 6)
-  3: operator: "+"
-  state "number" as 4
-  4: position: (0, 6)
-  4: value: 1
-  3 --> 4: left
-  state "binary expression" as 5
-  5: position: (0, 10)
-  5: operator: "-"
-  state "number" as 6
-  6: position: (0, 10)
-  6: value: 2
-  5 --> 6: left
+  2 --> 3: left
+  state "function call" as 4
+  4: name: "lol"
+  4: position: (0, 14)
+  2 --> 4: right
+  1 --> 2: value
+  ||
+  state "write" as 5
+  5: position: (1, 0)
+  state "binary expression" as 6
+  6: position: (1, 6)
+  6: operator: "=="
   state "binary expression" as 7
-  7: position: (0, 14)
-  7: operator: "*"
+  7: position: (1, 6)
+  7: operator: "+"
   state "number" as 8
-  8: position: (0, 14)
-  8: value: 3
+  8: position: (1, 6)
+  8: value: 1
   7 --> 8: left
   state "binary expression" as 9
-  9: position: (0, 18)
-  9: operator: "/"
+  9: position: (1, 10)
+  9: operator: "-"
   state "number" as 10
-  10: position: (0, 18)
-  10: value: 4
+  10: position: (1, 10)
+  10: value: 2
   9 --> 10: left
   state "binary expression" as 11
-  11: position: (0, 22)
-  11: operator: "%"
+  11: position: (1, 14)
+  11: operator: "*"
   state "number" as 12
-  12: position: (0, 22)
-  12: value: 5
+  12: position: (1, 14)
+  12: value: 3
   11 --> 12: left
-  state "number" as 13
-  13: position: (0, 26)
-  13: value: 6
+  state "binary expression" as 13
+  13: position: (1, 18)
+  13: operator: "/"
+  state "number" as 14
+  14: position: (1, 18)
+  14: value: 4
+  13 --> 14: left
+  state "binary expression" as 15
+  15: position: (1, 22)
+  15: operator: "%"
+  state "number" as 16
+  16: position: (1, 22)
+  16: value: 5
+  15 --> 16: left
+  state "number" as 17
+  17: position: (1, 26)
+  17: value: 6
+  15 --> 17: right
+  13 --> 15: right
   11 --> 13: right
   9 --> 11: right
   7 --> 9: right
-  5 --> 7: right
-  3 --> 5: right
-  2 --> 3: left
-  state "number" as 14
-  14: position: (0, 31)
-  14: value: 7
-  2 --> 14: right
-  1 --> 2: value
-  ||
-  state "write" as 15
-  15: position: (1, 0)
-  state "binary expression" as 16
-  16: position: (1, 6)
-  16: operator: "!="
-  state "number" as 17
-  17: position: (1, 6)
-  17: value: 7
-  16 --> 17: left
+  6 --> 7: left
   state "number" as 18
-  18: position: (1, 11)
-  18: value: 8
-  16 --> 18: right
-  15 --> 16: value
+  18: position: (1, 31)
+  18: value: 7
+  6 --> 18: right
+  5 --> 6: value
   ||
   state "write" as 19
   19: position: (2, 0)
   state "binary expression" as 20
   20: position: (2, 6)
-  20: operator: ">"
+  20: operator: "!="
   state "number" as 21
   21: position: (2, 6)
-  21: value: 8
+  21: value: 7
   20 --> 21: left
   state "number" as 22
-  22: position: (2, 10)
-  22: value: 9
+  22: position: (2, 11)
+  22: value: 8
   20 --> 22: right
   19 --> 20: value
   ||
@@ -89,14 +89,14 @@ state "code block" as 0 {
   23: position: (3, 0)
   state "binary expression" as 24
   24: position: (3, 6)
-  24: operator: ">="
+  24: operator: ">"
   state "number" as 25
   25: position: (3, 6)
-  25: value: 9
+  25: value: 8
   24 --> 25: left
   state "number" as 26
-  26: position: (3, 11)
-  26: value: 10
+  26: position: (3, 10)
+  26: value: 9
   24 --> 26: right
   23 --> 24: value
   ||
@@ -104,14 +104,14 @@ state "code block" as 0 {
   27: position: (4, 0)
   state "binary expression" as 28
   28: position: (4, 6)
-  28: operator: "<"
+  28: operator: ">="
   state "number" as 29
   29: position: (4, 6)
-  29: value: 10
+  29: value: 9
   28 --> 29: left
   state "number" as 30
   30: position: (4, 11)
-  30: value: 11
+  30: value: 10
   28 --> 30: right
   27 --> 28: value
   ||
@@ -119,14 +119,14 @@ state "code block" as 0 {
   31: position: (5, 0)
   state "binary expression" as 32
   32: position: (5, 6)
-  32: operator: "<="
+  32: operator: "<"
   state "number" as 33
   33: position: (5, 6)
-  33: value: 11
+  33: value: 10
   32 --> 33: left
   state "number" as 34
-  34: position: (5, 12)
-  34: value: 12
+  34: position: (5, 11)
+  34: value: 11
   32 --> 34: right
   31 --> 32: value
   ||
@@ -134,132 +134,147 @@ state "code block" as 0 {
   35: position: (6, 0)
   state "binary expression" as 36
   36: position: (6, 6)
-  36: operator: "||"
-  state "binary expression" as 37
+  36: operator: "<="
+  state "number" as 37
   37: position: (6, 6)
-  37: operator: "&&"
-  state "number" as 38
-  38: position: (6, 6)
-  38: value: 12
-  37 --> 38: left
-  state "number" as 39
-  39: position: (6, 12)
-  39: value: 13
-  37 --> 39: right
+  37: value: 11
   36 --> 37: left
-  state "number" as 40
-  40: position: (6, 18)
-  40: value: 14
-  36 --> 40: right
+  state "number" as 38
+  38: position: (6, 12)
+  38: value: 12
+  36 --> 38: right
   35 --> 36: value
   ||
-  state "variable definition" as 41
-  41: name: "x"
-  41: position: (7, 0)
+  state "write" as 39
+  39: position: (7, 0)
+  state "binary expression" as 40
+  40: position: (7, 6)
+  40: operator: "||"
+  state "binary expression" as 41
+  41: position: (7, 6)
+  41: operator: "&&"
   state "number" as 42
-  42: position: (7, 8)
-  42: value: 1
-  41 --> 42: value
+  42: position: (7, 6)
+  42: value: 12
+  41 --> 42: left
+  state "number" as 43
+  43: position: (7, 12)
+  43: value: 13
+  41 --> 43: right
+  40 --> 41: left
+  state "number" as 44
+  44: position: (7, 18)
+  44: value: 14
+  40 --> 44: right
+  39 --> 40: value
   ||
-  state "function definition" as 43
-  43: name: "y"
-  43: position: (8, 0)
-  43: z
-  state "code block" as 44 {
-    state "write" as 45
-    45: position: (9, 4)
-    state "identifier reference" as 46
-    46: name: "x"
-    46: position: (9, 10)
-    45 --> 46: value
-  }
-  44: position: (9, 4)
-  43 --> 44: body
+  state "variable definition" as 45
+  45: name: "x"
+  45: position: (8, 0)
+  state "number" as 46
+  46: position: (8, 8)
+  46: value: 1
+  45 --> 46: value
   ||
-  state "function call" as 47
+  state "function definition" as 47
   47: name: "y"
-  47: position: (11, 0)
-  state "identifier reference" as 48
-  48: name: "x"
-  48: position: (11, 2)
-  47 --> 48: parameter #0
-  ||
-  state "read" as 49
-  49: position: (12, 0)
-  49: identifier: "x"
-  ||
-  state "variable assignment" as 50
-  50: name: "x"
-  50: position: (13, 0)
-  state "number" as 51
-  51: position: (13, 4)
-  51: value: 2
-  50 --> 51: new value
-  ||
-  state "while" as 52
-  52: position: (14, 0)
-  state "number" as 53
-  53: position: (14, 7)
-  53: value: 1
-  52 --> 53: condition
-  state "code block" as 54 {
-    state "function call" as 55
-    55: name: "y"
-    55: position: (15, 4)
-    state "number" as 56
-    56: position: (15, 6)
-    56: value: 1
-    55 --> 56: parameter #0
+  47: position: (9, 0)
+  47: z
+  state "code block" as 48 {
+    state "write" as 49
+    49: position: (10, 4)
+    state "identifier reference" as 50
+    50: name: "x"
+    50: position: (10, 10)
+    49 --> 50: value
   }
-  54: position: (15, 4)
-  52 --> 54: body
+  48: position: (10, 4)
+  47 --> 48: body
   ||
-  state "if" as 57
-  57: position: (17, 0)
-  state "number" as 58
-  58: position: (17, 4)
-  58: value: 1
-  57 --> 58: condition
-  state "code block" as 59 {
-    state "function call" as 60
-    60: name: "y"
-    60: position: (18, 4)
-    state "number" as 61
-    61: position: (18, 6)
-    61: value: 2
-    60 --> 61: parameter #0
-  }
-  59: position: (18, 4)
-  57 --> 59: then
+  state "function call" as 51
+  51: name: "y"
+  51: position: (12, 0)
+  state "identifier reference" as 52
+  52: name: "x"
+  52: position: (12, 2)
+  51 --> 52: parameter #0
   ||
-  state "if" as 62
-  62: position: (20, 0)
-  state "number" as 63
-  63: position: (20, 4)
-  63: value: 1
-  62 --> 63: condition
-  state "code block" as 64 {
-    state "function call" as 65
-    65: name: "y"
-    65: position: (21, 4)
-    state "number" as 66
-    66: position: (21, 6)
-    66: value: 3
-    65 --> 66: parameter #0
+  state "read" as 53
+  53: position: (13, 0)
+  53: identifier: "x"
+  ||
+  state "variable assignment" as 54
+  54: name: "x"
+  54: position: (14, 0)
+  state "number" as 55
+  55: position: (14, 4)
+  55: value: 2
+  54 --> 55: new value
+  ||
+  state "while" as 56
+  56: position: (15, 0)
+  state "number" as 57
+  57: position: (15, 7)
+  57: value: 1
+  56 --> 57: condition
+  state "code block" as 58 {
+    state "function call" as 59
+    59: name: "y"
+    59: position: (16, 4)
+    state "number" as 60
+    60: position: (16, 6)
+    60: value: 1
+    59 --> 60: parameter #0
   }
-  64: position: (21, 4)
-  62 --> 64: then
-  state "code block" as 67 {
-    state "function call" as 68
-    68: name: "y"
-    68: position: (25, 4)
-    state "number" as 69
-    69: position: (25, 6)
-    69: value: 4
-    68 --> 69: parameter #0
+  58: position: (16, 4)
+  56 --> 58: body
+  ||
+  state "if" as 61
+  61: position: (18, 0)
+  state "number" as 62
+  62: position: (18, 4)
+  62: value: 1
+  61 --> 62: condition
+  state "code block" as 63 {
+    state "function call" as 64
+    64: name: "y"
+    64: position: (19, 4)
+    state "number" as 65
+    65: position: (19, 6)
+    65: value: 2
+    64 --> 65: parameter #0
   }
-  67: position: (25, 4)
-  62 --> 67: else
+  63: position: (19, 4)
+  61 --> 63: then
+  ||
+  state "if" as 66
+  66: position: (21, 0)
+  state "number" as 67
+  67: position: (21, 4)
+  67: value: 1
+  66 --> 67: condition
+  state "code block" as 68 {
+    state "function call" as 69
+    69: name: "y"
+    69: position: (22, 4)
+    state "number" as 70
+    70: position: (22, 6)
+    70: value: 3
+    69 --> 70: parameter #0
+  }
+  68: position: (22, 4)
+  66 --> 68: then
+  state "code block" as 71 {
+    state "function call" as 72
+    72: name: "y"
+    72: position: (26, 4)
+    state "number" as 73
+    73: position: (26, 6)
+    73: value: 4
+    72 --> 73: parameter #0
+  }
+  71: position: (26, 4)
+  66 --> 71: else
 }
 0: position: (0, 0)
 @enduml

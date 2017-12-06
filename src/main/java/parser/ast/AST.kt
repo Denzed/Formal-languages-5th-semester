@@ -181,6 +181,26 @@ private class PlantUMLConverter(val root: ASTNode) {
     }
 
 
+
+    private fun dfsFunctionCallStatement(
+            call: FunctionCallStatement,
+            indent: Int
+    ): Int {
+        val id = nodeCount++
+        val name = "${call.identifier}"
+        val description = listOf(
+                "name: \"$name\"",
+                "position: ${call.position}"
+        )
+        addVertex(id, "function call", description, emptyList(), indent)
+        call.parameters
+                .map { dfs(it, indent) }
+                .forEachIndexed {
+                    index, parameterId -> addEdge(id, parameterId, "parameter #$index", indent)
+                }
+        return id
+    }
+
     private fun dfsIdentifier(identifier: Identifier, indent: Int): Int {
         val id = nodeCount++
         val name = "$identifier"
@@ -229,6 +249,7 @@ private class PlantUMLConverter(val root: ASTNode) {
         is IfClause -> dfsIfClause(node, indent)
         is VariableAssignment -> dfsVariableAssignment(node, indent)
         is FunctionCall -> dfsFunctionCall(node, indent)
+        is FunctionCallStatement -> dfsFunctionCallStatement(node, indent)
         is Identifier -> dfsIdentifier(node, indent)
         is Number -> dfsNumber(node, indent)
         is BracedExpression -> dfsBracedExpression(node, indent)

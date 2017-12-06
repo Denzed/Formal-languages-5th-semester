@@ -26,13 +26,13 @@ CURLY_LPAREN
 
 statement
     :   functionDefinition
-    |   functionCall
     |   variableDefinition
     |   whileCycle
     |   readStatement
     |   writeStatement
     |   ifClause
     |   variableAssignment
+    |   functionCall
     ;
 
 functionDefinition
@@ -114,7 +114,8 @@ expression
     ;
 
 atomicExpression
-    :   identifier
+    :   functionCall
+    |   identifier
     |   literal
     |   bracedExpression
     ;
